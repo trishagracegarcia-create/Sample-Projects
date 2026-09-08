@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Little Week — Task Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF8EE;
+    --paper: #FFFDF9;
+    --ink: #5B4A3F;
+    --ink-soft: #8A7565;
+    --pink: #FFD3E0;
+    --pink-deep: #F4A6BF;
+    --mint: #C4E7D4;
+    --mint-deep: #8FCCAE;
+    --butter: #FFE9A8;
+    --butter-deep: #F2C94C;
+    --lavender: #E3D6F5;
+    --lavender-deep: #C6A8ED;
+    --line: #EADFCF;
+    --shadow: rgba(91, 74, 63, 0.12);
+  }
+ 
+  * { box-sizing: border-box; }
+ 
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    background-image:
+      radial-gradient(circle at 8% 12%, rgba(255,211,224,0.35) 0, transparent 40%),
+      radial-gradient(circle at 92% 85%, rgba(196,231,212,0.35) 0, transparent 40%);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--ink);
+    padding: 32px 20px 60px;
+  }
+ 
+  .wrap { max-width: 1180px; margin: 0 auto; }
+ 
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+ 
+  .title-block { display: flex; align-items: center; gap: 16px; }
+ 
+  .mascot { width: 64px; height: 64px; flex-shrink: 0; }
+ 
+  h1 {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 2.4rem;
+    margin: 0;
+    line-height: 1;
+    color: var(--ink);
+  }
+ 
+  .subtitle {
+    margin: 4px 0 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+ 
+  .week-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 8px;
+    box-shadow: 0 4px 0 var(--shadow);
+  }
+ 
+  .week-nav button {
+    border: none;
+    background: var(--lavender);
+    color: var(--ink);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .week-nav button:hover { transform: scale(1.1); }
+  .week-nav span { font-weight: 700; font-size: 0.9rem; padding: 0 6px; min-width: 150px; text-align: center; }
+ 
+  /* ---------- Progress ---------- */
+  .progress-card {
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    padding: 18px 22px;
+    margin-bottom: 26px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 0 var(--shadow);
+  }
+ 
+  .teacup { width: 54px; height: 54px; flex-shrink: 0; }
+ 
+  .progress-info { flex: 1; }
+ 
+  .progress-label {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+  }
+ 
+  .progress-track {
+    height: 14px;
+    background: #F1E8D8;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+ 
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--mint-deep), var(--butter-deep));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+ 
+  .progress-count {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.4rem;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+ 
+  /* ---------- Board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+  }
+ 
+  .day-card {
+    background: var(--paper);
+    border-radius: 18px;
+    border: 2px solid var(--line);
+    padding: 0 0 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 260px;
+    box-shadow: 0 5px 0 var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+ 
+  .day-card.today { border-color: var(--pink-deep); }
+ 
+  .washi {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.25rem;
+    color: var(--ink);
+  }
+ 
+  .washi-date { font-size: 0.75rem; font-weight: 700; color: var(--ink-soft); font-family: 'Quicksand', sans-serif; }
+ 
+  .day-card:nth-child(7n+1) .washi { background: var(--pink); }
+  .day-card:nth-child(7n+2) .washi { background: var(--butter); }
+  .day-card:nth-child(7n+3) .washi { background: var(--mint); }
+  .day-card:nth-child(7n+4) .washi { background: var(--lavender); }
+  .day-card:nth-child(7n+5) .washi { background: var(--pink); }
+  .day-card:nth-child(7n+6) .washi { background: var(--butter); }
+  .day-card:nth-child(7n+7) .washi { background: var(--mint); }
+ 
+  .today-badge {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: var(--pink-deep);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }
+ 
+  .task-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+ 
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FBF6EC;
+    border-radius: 10px;
+    padding: 7px 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+  }
+ 
+  .task-item.done { background: transparent; }
+  .task-item.done .task-text { text-decoration: line-through; color: #C2B6A8; }
+ 
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 2px solid var(--mint-deep);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-size: 0.75rem;
+    color: white;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+ 
+  .task-check.checked {
+    background: var(--mint-deep);
+    transform: scale(1.05);
+  }
+ 
+  .task-text {
+    flex: 1;
+    word-break: break-word;
+    line-height: 1.25;
+  }
+ 
+  .task-del {
+    border: none;
+    background: none;
+    color: #D9A6A6;
+    cursor: pointer;
+    font-size: 0.95rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    padding: 0 2px;
+  }
+  .task-item:hover .task-del { opacity: 1; }
+ 
+  .empty-hint {
+    text-align: center;
+    color: #C2B6A8;
+    font-size: 0.78rem;
+    padding: 14px 6px;
+    font-weight: 600;
+  }
+ 
+  .add-row {
+    display: flex;
+    gap: 6px;
+    padding: 10px 10px 0;
+  }
+ 
+  .add-row input {
+    flex: 1;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: #FBF6EC;
+    outline: none;
+  }
+  .add-row input:focus { border-color: var(--pink-deep); }
+ 
+  .add-row button {
+    border: none;
+    background: var(--butter-deep);
+    color: var(--ink);
+    width: 32px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .add-row button:hover { transform: scale(1.08); }
+ 
+  footer {
+    text-align: center;
+    margin-top: 34px;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+ 
+  .clear-btn {
+    background: none;
+    border: 2px solid var(--pink-deep);
+    color: var(--pink-deep);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .clear-btn:hover { background: var(--pink-deep); color: white; }
+ 
+  @media (max-width: 640px) {
+    h1 { font-size: 1.9rem; }
+    .week-nav span { min-width: 110px; font-size: 0.78rem; }
+  }
+ 
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+ 
+  <header>
+    <div class="title-block">
+      <svg class="mascot" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="38" rx="22" ry="20" fill="#FFD3E0"/>
+        <path d="M14 20 L20 8 L27 18 Z" fill="#FFD3E0"/>
+        <path d="M50 20 L44 8 L37 18 Z" fill="#FFD3E0"/>
+        <path d="M17 20 L21 12 L25 18 Z" fill="#F4A6BF"/>
+        <path d="M47 20 L43 12 L39 18 Z" fill="#F4A6BF"/>
+        <circle cx="24" cy="36" r="2.4" fill="#5B4A3F"/>
+        <circle cx="40" cy="36" r="2.4" fill="#5B4A3F"/>
+        <ellipse cx="32" cy="43" rx="2.2" ry="1.6" fill="#F4A6BF"/>
+        <path d="M27 47 Q32 51 37 47" stroke="#5B4A3F" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <line x1="10" y1="40" x2="20" y2="41" stroke="#5B4A3F" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="10" y1="44" x2="20" y2="44" stroke="#5B4A3F" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="44" y1="41" x2="54" y2="40" stroke="#5B4A3F" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="44" y1="44" x2="54" y2="44" stroke="#5B4A3F" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1>My Little Week</h1>
+        <p class="subtitle">a cozy place for your to-dos</p>
+      </div>
+    </div>
+    <div class="week-nav">
+      <button id="prevWeek" aria-label="Previous week">‹</button>
+      <span id="weekLabel">this week</span>
+      <button id="nextWeek" aria-label="Next week">›</button>
+    </div>
+  </header>
+ 
+  <div class="progress-card">
+    <svg class="teacup" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 26 H42 V42 A14 14 0 0 1 14 42 Z" fill="#F1E8D8" stroke="#EADFCF" stroke-width="2"/>
+      <path id="teaFill" d="M14 42 H42 V42 A14 14 0 0 1 14 42 Z" fill="#8FCCAE"/>
+      <path d="M42 30 Q54 30 52 38 Q50 45 42 42" stroke="#EADFCF" stroke-width="2.5" fill="none"/>
+      <ellipse cx="28" cy="26" rx="14" ry="3" fill="#FBF6EC" stroke="#EADFCF" stroke-width="2"/>
+    </svg>
+    <div class="progress-info">
+      <div class="progress-label">weekly progress</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="progress-count" id="progressCount">0 / 0</div>
+  </div>
+ 
+  <div class="board" id="board"></div>
+ 
+  <footer>
+    made with ♡ for cozy productivity
+    <br>
+    <button class="clear-btn" id="clearDone">clear checked tasks</button>
+  </footer>
+ 
+</div>
+ 
+<script>
+(function(){
+  const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const STORAGE_KEY = "myLittleWeek.v1";
+  const board = document.getElementById('board');
+  const weekLabel = document.getElementById('weekLabel');
+  const progressFill = document.getElementById('progressFill');
+  const progressCount = document.getElementById('progressCount');
+  const teaFill = document.getElementById('teaFill');
+ 
+  let weekOffset = 0;
+ 
+  function loadData(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e){ return {}; }
+  }
+  function saveData(data){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){}
+  }
+ 
+  let data = loadData();
+ 
+  function getMonday(offset){
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMonday = (day === 0 ? -6 : 1 - day);
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday + offset*7);
+    monday.setHours(0,0,0,0);
+    return monday;
+  }
+ 
+  function fmtDate(d){
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+ 
+  function keyFor(d){
+    return d.toISOString().slice(0,10);
+  }
+ 
+  function isSameDay(a,b){
+    return a.toDateString() === b.toDateString();
+  }
+ 
+  function render(){
+    const monday = getMonday(weekOffset);
+    const sunday = new Date(monday); sunday.setDate(monday.getDate()+6);
+    weekLabel.textContent = weekOffset === 0
+      ? `${fmtDate(monday)} – ${fmtDate(sunday)}`
+      : `${fmtDate(monday)} – ${fmtDate(sunday)}`;
+ 
+    board.innerHTML = '';
+    const today = new Date();
+    let totalTasks = 0, doneTasks = 0;
+ 
+    const order = [1,2,3,4,5,6,0]; // Mon..Sun
+    order.forEach(dow => {
+      const d = new Date(monday);
+      const offsetDays = order.indexOf(dow);
+      d.setDate(monday.getDate() + offsetDays);
+      const dKey = keyFor(d);
+      if(!data[dKey]) data[dKey] = [];
+      const tasks = data[dKey];
+ 
+      totalTasks += tasks.length;
+      doneTasks += tasks.filter(t => t.done).length;
+ 
+      const card = document.createElement('div');
+      card.className = 'day-card' + (isSameDay(d, today) ? ' today' : '');
+ 
+      const washi = document.createElement('div');
+      washi.className = 'washi';
+      washi.innerHTML = `<span>${DAYS[dow]}</span><span class="washi-date">${fmtDate(d)}</span>`;
+      card.appendChild(washi);
+ 
+      if(isSameDay(d, today)){
+        const badge = document.createElement('div');
+        badge.className = 'today-badge';
+        badge.textContent = 'today';
+        card.appendChild(badge);
+      }
+ 
+      const list = document.createElement('ul');
+      list.className = 'task-list';
+ 
+      if(tasks.length === 0){
+        const hint = document.createElement('li');
+        hint.className = 'empty-hint';
+        hint.textContent = 'nothing planned yet ✿';
+        list.appendChild(hint);
+      } else {
+        tasks.forEach((task, idx) => {
+          const li = document.createElement('li');
+          li.className = 'task-item' + (task.done ? ' done' : '');
+ 
+          const check = document.createElement('div');
+          check.className = 'task-check' + (task.done ? ' checked' : '');
+          check.textContent = task.done ? '✓' : '';
+          check.addEventListener('click', () => {
+            task.done = !task.done;
+            saveData(data);
+            render();
+          });
+ 
+          const text = document.createElement('span');
+          text.className = 'task-text';
+          text.textContent = task.text;
+ 
+          const del = document.createElement('button');
+          del.className = 'task-del';
+          del.textContent = '✕';
+          del.setAttribute('aria-label', 'Delete task');
+          del.addEventListener('click', () => {
+            tasks.splice(idx, 1);
+            saveData(data);
+            render();
+          });
+ 
+          li.appendChild(check);
+          li.appendChild(text);
+          li.appendChild(del);
+          list.appendChild(li);
+        });
+      }
+ 
+      card.appendChild(list);
+ 
+      const addRow = document.createElement('div');
+      addRow.className = 'add-row';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'add a task…';
+      input.maxLength = 60;
+      const addBtn = document.createElement('button');
+      addBtn.textContent = '+';
+      addBtn.setAttribute('aria-label', 'Add task');
+ 
+      function addTask(){
+        const val = input.value.trim();
+        if(!val) return;
+        tasks.push({ text: val, done: false });
+        saveData(data);
+        input.value = '';
+        render();
+      }
+      addBtn.addEventListener('click', addTask);
+      input.addEventListener('keydown', e => { if(e.key === 'Enter') addTask(); });
+ 
+      addRow.appendChild(input);
+      addRow.appendChild(addBtn);
+      card.appendChild(addRow);
+ 
+      board.appendChild(card);
+    });
+ 
+    const pct = totalTasks === 0 ? 0 : Math.round((doneTasks/totalTasks)*100);
+    progressFill.style.width = pct + '%';
+    progressCount.textContent = `${doneTasks} / ${totalTasks}`;
+    const teaHeight = 16 * (pct/100);
+    teaFill.setAttribute('d', `M14 ${42-teaHeight} H42 V42 A14 14 0 0 1 14 42 Z`);
+ 
+    saveData(data);
+  }
+ 
+  document.getElementById('prevWeek').addEventListener('click', () => { weekOffset--; render(); });
+  document.getElementById('nextWeek').addEventListener('click', () => { weekOffset++; render(); });
+  document.getElementById('clearDone').addEventListener('click', () => {
+    Object.keys(data).forEach(k => { data[k] = data[k].filter(t => !t.done); });
+    saveData(data);
+    render();
+  });
+ 
+  render();
+})();
+</script>
+</body>
+</html>
+ 
